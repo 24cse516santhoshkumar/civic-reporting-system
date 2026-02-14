@@ -1,0 +1,201 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Users, FileText, CheckCircle, Clock, AlertTriangle, MapPin, Calendar, ArrowRight, Activity, TrendingUp } from 'lucide-react';
+import Layout from '../components/Layout';
+import { motion } from 'framer-motion';
+import DashboardMap from '../components/DashboardMap';
+import DashboardCharts from '../components/DashboardCharts';
+
+interface DashboardStats {
+    total: number;
+    resolved: number;
+    open: number; // pending
+    inProgress: number;
+    avgResolutionTime?: string;
+    wardPerformance?: Record<string, number>;
+}
+
+const Dashboard = () => {
+    const navigate = useNavigate();
+    const [stats, setStats] = useState<DashboardStats>({
+        total: 0,
+        resolved: 0,
+        open: 0,
+        inProgress: 0
+    });
+    const [recentReports, setRecentReports] = useState<any[]>([]);
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+
+        fetchDashboardData();
+    }, []);
+
+    const fetchDashboardData = async () => {
+        try {
+            const [statsRes, reportsRes] = await Promise.all([
+                axios.get('http://localhost:3000/analytics/dashboard-stats'),
+                axios.get('http://localhost:3000/reports?limit=5')
+            ]);
+            setStats(statsRes.data);
+            setRecentReports(reportsRes.data);
+        } catch (error) {
+            console.error("Failed to fetch dashboard data", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const StatusBadge = ({ status }: { status: string }) => {
+        const styles = {
+            PENDING: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+            IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+            RESOLVED: "bg-green-500/10 text-green-400 border-green-500/20",
+            REJECTED: "bg-red-500/10 text-red-400 border-red-500/20"
+        };
+        return (
+            <span className={`px-2 py-1 rounded-md text-xs font-bold border ${styles[status as keyof typeof styles] || "bg-gray-500/10 text-gray-400"}`}>
+                {status.replace('_', ' ')}
+            </span>
+        );
+    };
+
+    return (
+        <Layout userRole={user?.role}>
+            <div className="max-w-7xl mx-auto space-y-8">
+                <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold dark:text-white text-gray-900 tracking-tight">
+                            Welcome back, {user?.email?.split('@')[0] || 'User'}
+                        </h1>
+                        <p className="dark:text-gray-400 text-gray-600 mt-1">Here's what's happening in your city today.</p>
+                    </div>
+                    {/* Removed Generate Report button for Admin Dashboard consistency or kept if admins create reports? Keeping it but it might need a real action */}
+                    <button onClick={() => navigate('/create-report')} className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-blue-500/20 transition-all font-bold flex items-center gap-2">
+                        <FileText size={18} /> Create Report
+                    </button>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Total Reports</p>
+                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.total}</h3>
+                            </div>
+                            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500 dark:text-blue-400">
+                                <FileText size={24} />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
+                            <TrendingUp size={14} className="mr-1" /> +12% from last month
+                        </div>
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Resolved</p>
+                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.resolved}</h3>
+                            </div>
+                            <div className="p-3 bg-green-500/10 rounded-xl text-green-500 dark:text-green-400">
+                                <CheckCircle size={24} />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center text-xs dark:text-gray-400 text-gray-500">
+                            <Activity size={14} className="mr-1" /> Avg time: {stats.avgResolutionTime || 'N/A'}
+                        </div>
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">In Progress</p>
+                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.inProgress}</h3>
+                            </div>
+                            <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 dark:text-yellow-400">
+                                <Clock size={24} />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center text-xs text-yellow-600 dark:text-yellow-500">
+                            <AlertTriangle size={14} className="mr-1" /> {stats.open} Pending validation
+                        </div>
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Active Users</p>
+                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">1,240</h3>
+                            </div>
+                            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 dark:text-purple-400">
+                                <Users size={24} />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
+                            <TrendingUp size={14} className="mr-1" /> +5% new users
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Map Section */}
+                <DashboardMap />
+
+                {/* Charts Section */}
+                <DashboardCharts stats={stats} />
+
+                {/* Recent Activities */}
+                <div className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold dark:text-white text-gray-900">Recent Reports</h2>
+                        {/* Reports page is deleted, so no View All link */}
+                    </div>
+
+                    <div className="space-y-4">
+                        {loading ? (
+                            <div className="text-center py-10 dark:text-gray-400 text-gray-500">Loading reports...</div>
+                        ) : recentReports.length > 0 ? (
+                            recentReports.map((report) => (
+                                <div key={report.report_id} className="flex items-center justify-between p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:shadow-lg transition-all border border-transparent hover:border-white/20 dark:hover:border-white/10 group cursor-pointer" onClick={() => navigate(`/issues/${report.report_id}`)}>
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 overflow-hidden relative">
+                                            {report.image_url ? (
+                                                <img src={report.image_url} alt="Report" className="h-full w-full object-cover" />
+                                            ) : (
+                                                <div className="h-full w-full flex items-center justify-center dark:bg-gray-800 bg-gray-300 dark:text-gray-500 text-gray-400">
+                                                    <FileText size={20} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold dark:text-white text-gray-900 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">{report.title}</h4>
+                                            <div className="flex items-center text-xs dark:text-gray-400 text-gray-500 mt-1 gap-3">
+                                                <span className="flex items-center"><MapPin size={12} className="mr-1 text-red-400" /> {report.location}</span>
+                                                <span className="flex items-center"><Calendar size={12} className="mr-1" /> {new Date(report.created_at).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <StatusBadge status={report.status} />
+                                        <ArrowRight size={16} className="dark:text-gray-600 text-gray-400 group-hover:translate-x-1 transition-transform duration-300" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-10 dark:text-gray-400 text-gray-500">No recent reports found.</div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </Layout>
+    );
+};
+
+export default Dashboard;
