@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, ArrowRight, Activity, Users, CheckCircle, Truck, Lightbulb, Moon, Sun, Globe, Zap, Box, Layers, MousePointer2, Trash2, AlertTriangle } from 'lucide-react';
+import { Shield, ArrowRight, Users, CheckCircle, Moon, Sun, Zap, MousePointer2, Truck, Trash2, AlertTriangle, Box, Layers } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
@@ -226,9 +226,9 @@ const Landing = () => {
                                     key={idx}
                                     className="relative group/card"
                                 >
-                                    <div className={`absolute -inset-px rounded-3xl bg-gradient-to-br ${item.color} opacity-0 group-hover/card:opacity-10 dark:group-hover/card:opacity-20 transition-all duration-500`}></div>
+                                    <div className={`absolute - inset - px rounded - 3xl bg - gradient - to - br ${item.color} opacity - 0 group - hover / card: opacity - 10 dark: group - hover / card: opacity - 20 transition - all duration - 500`}></div>
                                     <div className="bg-white/80 dark:bg-white/[0.01] backdrop-blur-xl p-10 rounded-3xl border border-gray-200 dark:border-white/5 group-hover/card:border-white/20 transition-all duration-500 shadow-xl dark:shadow-none h-full flex flex-col">
-                                        <div className={`mb-8 p-4 rounded-2xl bg-gray-100 dark:bg-white/5 border border-white/5 w-fit ${item.iconColor} group-hover/card:scale-110 transition-transform duration-500`}>
+                                        <div className={`mb - 8 p - 4 rounded - 2xl bg - gray - 100 dark: bg - white / 5 border border - white / 5 w - fit ${item.iconColor} group - hover / card: scale - 110 transition - transform duration - 500`}>
                                             <item.icon size={32} />
                                         </div>
                                         <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6 uppercase tracking-tighter italic">{item.title}</h3>
@@ -314,20 +314,21 @@ const Landing = () => {
             </footer>
 
             <style>{`
-                @keyframes scan {
-                    from { transform: translateY(-100%); }
+@keyframes scan {
+                    from { transform: translateY(-100 %); }
                     to { transform: translateY(110vh); }
+}
+                .animate - gradient - xy {
+    background - size: 400 % 400 %;
+    animation: gradient - xy 15s ease infinite;
+}
+@keyframes gradient - xy {
+    0 % { background- position: 0 % 50 %;
+}
+50 % { background- position: 100 % 50 %; }
+100 % { background- position: 0 % 50 %; }
                 }
-                .animate-gradient-xy {
-                    background-size: 400% 400%;
-                    animation: gradient-xy 15s ease infinite;
-                }
-                @keyframes gradient-xy {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-            `}</style>
+`}</style>
         </div>
     );
 };

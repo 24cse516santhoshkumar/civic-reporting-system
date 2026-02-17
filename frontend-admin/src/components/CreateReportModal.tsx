@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, MapPin, Loader2, Camera, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, MapPin, Loader2, Camera, Upload, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -197,8 +197,8 @@ const CreateReportModal = ({ isOpen, onClose, onSuccess }: CreateReportModalProp
                                 onDrop={handleDrop}
                                 onClick={() => fileInputRef.current?.click()}
                                 className={`relative h-56 rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group overflow-hidden ${dragActive
-                                        ? 'border-blue-500 bg-blue-500/10'
-                                        : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
+                                    ? 'border-blue-500 bg-blue-500/10'
+                                    : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
                                     }`}
                             >
                                 {imagePreview ? (
