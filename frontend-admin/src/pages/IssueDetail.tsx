@@ -62,7 +62,7 @@ const IssueDetail = () => {
         if (!id) return;
 
         setLoading(true);
-        axios.get(`http://localhost:3000/reports/${id}`)
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/reports/${id}`)
             .then(res => {
                 const data = res.data;
                 const reporterName = data.user?.email ? data.user.email.split('@')[0] : 'Citizen User';
@@ -157,7 +157,7 @@ const IssueDetail = () => {
         try {
             const token = localStorage.getItem('token');
             if (!issue) return;
-            await axios.delete(`http://localhost:3000/reports/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/reports/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert("Report deleted successfully.");
@@ -172,7 +172,7 @@ const IssueDetail = () => {
     const handleAssignDepartment = async (dept: string) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.patch(`http://localhost:3000/reports/${id}/assign-department`, { department: dept }, {
+            await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/reports/${id}/assign-department`, { department: dept }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (issue) {
@@ -189,7 +189,7 @@ const IssueDetail = () => {
     const handleUpdateStatus = async (newStatus: string) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.patch(`http://localhost:3000/reports/${id}/status`, { status: newStatus }, {
+            await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/reports/${id}/status`, { status: newStatus }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (issue) {

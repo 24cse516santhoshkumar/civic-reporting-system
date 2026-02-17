@@ -23,7 +23,7 @@ const DashboardMap = () => {
     useEffect(() => {
         const fetchHeatmapData = async () => {
             try {
-                const res = await axios.get('http://localhost:3000/analytics/heatmap');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/analytics/heatmap`);
                 // Ensure data is in correct format [lat, lng]
                 setHeatmapData(res.data);
             } catch (error) {

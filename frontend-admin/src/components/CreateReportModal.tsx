@@ -137,7 +137,7 @@ const CreateReportModal = ({ isOpen, onClose, onSuccess }: CreateReportModalProp
                 image_url: formData.image_url || "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=400"
             };
 
-            await axios.post('http://localhost:3000/reports', payload);
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/reports`, payload);
 
             // Success Logic
             setLoading(false);

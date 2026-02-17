@@ -38,7 +38,7 @@ const Monitor = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await axios.get('http://localhost:3000/analytics/dashboard-stats');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/analytics/dashboard-stats`);
                 setBackendStats(res.data);
             } catch (err) {
                 console.error("Failed to fetch monitor stats", err);
@@ -64,7 +64,7 @@ const Monitor = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const reportsRes = await axios.get('http://localhost:3000/reports?limit=15');
+                const reportsRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/reports?limit=15`);
                 const data = reportsRes.data;
                 setReports(data);
 

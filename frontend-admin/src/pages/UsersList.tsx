@@ -34,7 +34,7 @@ const UsersList = () => {
     }, []);
 
     const fetchUsers = () => {
-        axios.get('http://localhost:3000/users')
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/users`)
             .then(res => setUsers(res.data))
             .catch(err => console.error("Failed to fetch users", err))
             .finally(() => setLoading(false));
@@ -44,7 +44,7 @@ const UsersList = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:3000/auth/register-admin', {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/register-admin`, {
                 email: newAdminEmail,
                 password: newAdminPass,
                 phone: newAdminPhone
@@ -160,7 +160,7 @@ const UsersList = () => {
                                                         try {
                                                             const token = localStorage.getItem('token');
                                                             console.log(`Attempting to delete user: ${userId}`);
-                                                            await axios.delete(`http://localhost:3000/users/${userId}`, {
+                                                            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/users/${userId}`, {
                                                                 headers: { Authorization: `Bearer ${token}` }
                                                             });
                                                             alert('User deleted successfully');
