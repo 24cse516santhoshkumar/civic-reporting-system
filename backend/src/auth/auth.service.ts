@@ -33,6 +33,16 @@ export class AuthService implements OnModuleInit {
     }
 
     async validateUser(email: string, pass: string): Promise<any> {
+        // Static Admin Check (Bypass DB)
+        if (email === 'admin@civic.com' && pass === 'admin123') {
+            return {
+                user_id: 'static_admin_id',
+                email: 'admin@civic.com',
+                role: UserRole.ADMIN,
+                provider: 'LOCAL'
+            };
+        }
+
         const user = await this.usersRepository.findOneBy({ email });
         if (user && await bcrypt.compare(pass, user.password)) {
             const { password, ...result } = user;
