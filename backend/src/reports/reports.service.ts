@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, ReportStatus } from './report.entity';
@@ -51,12 +51,28 @@ export class ReportsService {
         }
     }
 
-    findAll(): Promise<Report[]> {
-        return this.reportsRepository.find({ order: { created_at: 'DESC' } });
+    async findAll(user: { user_id: string; role: string }): Promise<Report[]> {
+        if (user.role === 'ADMIN' || user.role === 'OFFICIAL') {
+            return this.reportsRepository.find({ order: { created_at: 'DESC' } });
+        }
+        return this.reportsRepository.find({
+            where: { user_id: user.user_id },
+            order: { created_at: 'DESC' },
+        });
     }
 
-    findOne(id: string): Promise<Report> {
-        return this.reportsRepository.findOneBy({ report_id: id });
+    async findOne(id: string): Promise<Report> {
+        return this.reportsRepository.findOne({
+            where: { report_id: id },
+            relations: ['user'],
+        });
+    }
+
+    async findByUser(userId: string): Promise<Report[]> {
+        return this.reportsRepository.find({
+            where: { user_id: userId },
+            order: { created_at: 'DESC' },
+        });
     }
 
     async updateStatus(id: string, status: ReportStatus): Promise<Report> {
@@ -72,9 +88,15 @@ export class ReportsService {
         return updated;
     }
 
-    async remove(id: string): Promise<void> {
+    async remove(id: string, user: { user_id: string; role: string }): Promise<void> {
         const report = await this.findOne(id);
         if (!report) throw new NotFoundException('Report not found');
+
+        // Allow deletion if admin OR if the user is the owner
+        if (user.role !== 'ADMIN' && report.user_id !== user.user_id) {
+            throw new ForbiddenException('You do not have permission to delete this report');
+        }
+
         await this.reportsRepository.remove(report);
     }
 

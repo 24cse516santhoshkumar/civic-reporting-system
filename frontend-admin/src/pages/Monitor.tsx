@@ -33,14 +33,30 @@ const Monitor = () => {
         uptime: '12:45:22'
     });
 
+    const [backendStats, setBackendStats] = useState<{ totalUsers?: number; total?: number } | null>(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await axios.get('http://localhost:3000/analytics/dashboard-stats');
+                setBackendStats(res.data);
+            } catch (err) {
+                console.error("Failed to fetch monitor stats", err);
+            }
+        };
+        fetchStats();
+        const interval = setInterval(fetchStats, 10000);
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         const interval = setInterval(() => {
-            setMetrics(prev => ({
+            setMetrics({
                 cpu: Math.floor(Math.random() * (60 - 40) + 40),
                 mem: Math.floor(Math.random() * (70 - 60) + 60),
                 lat: Math.floor(Math.random() * (30 - 20) + 20),
                 uptime: new Date().toLocaleTimeString([], { hour12: false })
-            }));
+            });
         }, 3000);
         return () => clearInterval(interval);
     }, []);
@@ -129,7 +145,9 @@ const Monitor = () => {
                     <div className="bg-black/60 border border-yellow-500/20 p-3 rounded-sm flex flex-col relative overflow-hidden">
                         <span className="text-[10px] text-yellow-500/60 uppercase font-black">Active Units</span>
                         <div className="flex items-end gap-2 mt-1">
-                            <span className="text-2xl font-black">042</span>
+                            <span className="text-2xl font-black">
+                                {String(backendStats?.totalUsers || 0).padStart(3, '0')}
+                            </span>
                             <Shield size={16} className="text-yellow-500 mb-1.5 opacity-50" />
                         </div>
                     </div>
@@ -240,8 +258,8 @@ const Monitor = () => {
                         {/* Footer Mini Stats */}
                         <div className="p-3 border-t border-cyan-500/20 bg-black flex justify-between items-center text-[10px]">
                             <div className="flex gap-4">
-                                <span className="flex items-center gap-1"><Users size={12} className="text-cyan-500" /> 12 Active</span>
-                                <span className="flex items-center gap-1"><Shield size={12} className="text-yellow-500" /> 05 Ready</span>
+                                <span className="flex items-center gap-1"><Users size={12} className="text-cyan-500" /> {backendStats?.totalUsers || 0} Registered</span>
+                                <span className="flex items-center gap-1"><Shield size={12} className="text-yellow-500" /> {backendStats?.total || 0} Reports</span>
                             </div>
                             <span className="animate-pulse text-green-500 italic">SYSTEM_READY</span>
                         </div>

@@ -9,6 +9,7 @@ import UsersList from './pages/UsersList';
 import UserProfile from './pages/UserProfile';
 import CreateReport from './pages/CreateReport';
 import About from './pages/About';
+import Reports from './pages/Reports';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import Debug from './pages/Debug';
@@ -59,7 +60,7 @@ function App() {
         <Route
           path="/create-report"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['CITIZEN']}>
               <CreateReport />
             </ProtectedRoute>
           }
@@ -69,6 +70,14 @@ function App() {
           element={
             <ProtectedRoute>
               <IssueDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'OFFICIAL']}>
+              <Reports />
             </ProtectedRoute>
           }
         />

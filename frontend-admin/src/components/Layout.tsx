@@ -40,7 +40,8 @@ const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
     return (
         <div className={`min-h-screen relative flex flex-col overflow-hidden font-sans selection:bg-blue-500 selection:text-white transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {/* Dynamic Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
+            <div className="fixed inset-0 z-0 pointer-events-none bg-[#0f172a]">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-black to-purple-900/20"></div>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentBg}
@@ -48,12 +49,12 @@ const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 2 }}
-                        className="absolute inset-0 bg-cover bg-center"
+                        className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-screen"
                         style={{ backgroundImage: `url(${BACKGROUNDS[currentBg]})` }}
                     />
                 </AnimatePresence>
                 {/* Overlay - Adjust based on theme */}
-                <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-500 ${isDarkMode ? 'bg-black/70' : 'bg-white/40'}`}></div>
+                <div className={`absolute inset-0 backdrop-blur-[2px] transition-colors duration-500 ${isDarkMode ? 'bg-black/80' : 'bg-white/40'}`}></div>
             </div>
 
             {/* Header */}

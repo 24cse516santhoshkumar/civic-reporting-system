@@ -20,14 +20,36 @@ const DEPARTMENTS = [
     'General Administration'
 ];
 
+interface Issue {
+    report_id: string;
+    id?: string; // for mock fallback
+    title: string;
+    category: string;
+    description: string;
+    location: string;
+    status: string;
+    user_id: string;
+    created_at: string;
+    updated_at?: string;
+    image_url?: string;
+    imageUrl?: string; // for compatibility
+    priority?: string;
+    reporter?: string;
+    reporterPhone?: string;
+    assigned_department?: string;
+    date?: string; // for display
+}
+
 const IssueDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [currentBg, setCurrentBg] = useState(0);
-    const [issue, setIssue] = useState<any>(null);
+    const [issue, setIssue] = useState<Issue | null>(null);
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const reportRef = useRef<HTMLDivElement>(null);
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const userRole = user.role;
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -43,22 +65,32 @@ const IssueDetail = () => {
         axios.get(`http://localhost:3000/reports/${id}`)
             .then(res => {
                 const data = res.data;
+                const reporterName = data.user?.email ? data.user.email.split('@')[0] : 'Citizen User';
+
                 setIssue({
                     ...data,
-                    category: data.category || 'Report Issue', // Fix: use category field
+                    report_id: data.report_id || id || '',
+                    title: data.category || 'Untitled Report', // Title is usually category in this design
+                    user_id: data.user_id || '',
+                    created_at: data.created_at || new Date().toISOString(),
+                    category: data.category || 'Report Issue',
                     date: new Date(data.created_at).toLocaleDateString(),
                     imageUrl: data.image_url || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
                     priority: 'HIGH',
-                    reporter: 'Citizen User',
-                    reporterPhone: '+91 98XXX XXXXX'
+                    reporter: reporterName,
+                    reporterPhone: data.user?.phone_number || 'N/A'
                 });
                 setLoading(false);
             })
             .catch(err => {
                 console.log("Failed to fetch issue, using mock", err);
                 // Mock fallback...
-                const mockIssue = {
-                    id,
+                const mockIssue: Issue = {
+                    report_id: id || 'mock-id',
+                    id: id || 'mock-id',
+                    title: 'Road Damage Mock',
+                    user_id: 'mock-user',
+                    created_at: new Date().toISOString(),
                     category: 'Road Damage',
                     description: 'Severe pothole causing traffic congestion.',
                     location: 'Main Street, City Center',
@@ -75,6 +107,7 @@ const IssueDetail = () => {
     }, [id]);
 
     const handleShare = async () => {
+        if (!issue) return;
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -93,7 +126,7 @@ const IssueDetail = () => {
     };
 
     const handleDownloadPdf = async () => {
-        if (!reportRef.current) return;
+        if (!reportRef.current || !issue) return;
         setDownloading(true);
         try {
             const canvas = await html2canvas(reportRef.current, {
@@ -101,7 +134,7 @@ const IssueDetail = () => {
                 useCORS: true, // Important for external images
                 logging: true,
                 backgroundColor: '#111827' // Dark background for PDF
-            } as any);
+            });
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -123,14 +156,16 @@ const IssueDetail = () => {
 
         try {
             const token = localStorage.getItem('token');
+            if (!issue) return;
             await axios.delete(`http://localhost:3000/reports/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert("Report deleted successfully.");
             navigate('/dashboard');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Delete failed", error);
-            alert(`Failed to delete report: ${error.response?.data?.message || error.message}`);
+            const errMsg = error instanceof Error ? error.message : String(error);
+            alert(`Failed to delete report: ${errMsg}`);
         }
     };
 
@@ -140,11 +175,31 @@ const IssueDetail = () => {
             await axios.patch(`http://localhost:3000/reports/${id}/assign-department`, { department: dept }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setIssue({ ...issue, assigned_department: dept, updated_at: new Date().toISOString() });
+            if (issue) {
+                setIssue({ ...issue, assigned_department: dept, updated_at: new Date().toISOString() });
+            }
             alert(`Report assigned to ${dept}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Assignment failed", error);
-            alert(`Failed to assign department: ${error.response?.data?.message || error.message}`);
+            const errMsg = error instanceof Error ? error.message : String(error);
+            alert(`Failed to assign department: ${errMsg}`);
+        }
+    };
+
+    const handleUpdateStatus = async (newStatus: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.patch(`http://localhost:3000/reports/${id}/status`, { status: newStatus }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (issue) {
+                setIssue({ ...issue, status: newStatus, updated_at: new Date().toISOString() });
+            }
+            alert(`Report status updated to ${newStatus}`);
+        } catch (error: unknown) {
+            console.error("Status update failed", error);
+            const errMsg = error instanceof Error ? error.message : String(error);
+            alert(`Failed to update status: ${errMsg}`);
         }
     };
 
@@ -307,40 +362,69 @@ const IssueDetail = () => {
                             </div>
                         </div>
 
-                        {/* Admin Actions */}
+                        {/* Actions Sidebar */}
                         <div className="bg-gradient-to-b from-blue-900/40 to-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl" data-html2canvas-ignore>
                             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6 flex items-center">
                                 <Shield className="h-4 w-4 mr-2 text-blue-400" />
-                                Administrative Actions
+                                {userRole === 'ADMIN' ? 'Administrative Actions' : userRole === 'OFFICIAL' ? 'Official Actions' : 'Report Actions'}
                             </h3>
 
                             <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-400 uppercase tracking-wider ml-1">Assign Department</label>
-                                    <div className="relative group/select">
-                                        <select
-                                            value={issue.assigned_department || ""}
-                                            onChange={(e) => handleAssignDepartment(e.target.value)}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer text-white"
-                                        >
-                                            <option value="" disabled className="bg-gray-900">Select Department</option>
-                                            {DEPARTMENTS.map(dept => (
-                                                <option key={dept} value={dept} className="bg-gray-900 text-white">{dept}</option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/select:text-blue-400 transition-colors">
-                                            <Activity className="h-4 w-4" />
+                                {userRole === 'OFFICIAL' && issue.status !== 'RESOLVED' && (
+                                    <button
+                                        onClick={() => handleUpdateStatus('RESOLVED')}
+                                        className="w-full py-3 px-4 rounded-xl bg-green-600/10 hover:bg-green-600/20 text-green-500 font-bold border border-green-500/10 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <CheckCircle2 size={16} /> Complete Report
+                                    </button>
+                                )}
+                                {userRole === 'ADMIN' && (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <button
+                                                onClick={() => handleUpdateStatus('IN_PROGRESS')}
+                                                className="py-3 px-4 rounded-xl bg-green-600/10 hover:bg-green-600/20 text-green-500 font-bold border border-green-500/10 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <CheckCircle2 size={16} /> Accept
+                                            </button>
+                                            <button
+                                                onClick={() => handleUpdateStatus('REJECTED')}
+                                                className="py-3 px-4 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-500 font-bold border border-red-500/10 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <Activity size={16} /> Reject
+                                            </button>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <button
-                                    onClick={handleDeleteIssue}
-                                    className="w-full py-3 px-4 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-500 font-medium border border-red-500/10 transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                    Delete Report
-                                </button>
+                                        <div className="space-y-2">
+                                            <label className="text-xs text-gray-400 uppercase tracking-wider ml-1">Assign Department</label>
+                                            <div className="relative group/select">
+                                                <select
+                                                    value={issue.assigned_department || ""}
+                                                    onChange={(e) => handleAssignDepartment(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer text-white"
+                                                >
+                                                    <option value="" disabled className="bg-gray-900">Select Department</option>
+                                                    {DEPARTMENTS.map(dept => (
+                                                        <option key={dept} value={dept} className="bg-gray-900 text-white">{dept}</option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/select:text-blue-400 transition-colors">
+                                                    <Activity className="h-4 w-4" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {(userRole === 'ADMIN' || issue.user_id === user.user_id) && (
+                                    <button
+                                        onClick={handleDeleteIssue}
+                                        className="w-full py-3 px-4 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-500 font-medium border border-red-500/10 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        Delete Report
+                                    </button>
+                                )}
                             </div>
 
                             <p className="text-xs text-gray-500 mt-4 text-center italic">

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Query, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Query, Delete, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -17,12 +17,9 @@ export class ReportsController {
     }
 
     @Get()
-    findAll(@Query('lat') lat?: number, @Query('lng') lng?: number) {
-        if (lat && lng) {
-            // nearby logic to be added
-            return this.reportsService.findAll();
-        }
-        return this.reportsService.findAll();
+    @UseGuards(JwtAuthGuard)
+    findAll(@Req() req: any) {
+        return this.reportsService.findAll(req.user);
     }
 
     @Get(':id')
@@ -30,16 +27,22 @@ export class ReportsController {
         return this.reportsService.findOne(id);
     }
 
+    @Get('user/:userId')
+    async findByUser(@Param('userId') userId: string) {
+        return this.reportsService.findByUser(userId);
+    }
+
     @Patch(':id/status')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN, UserRole.OFFICIAL)
     updateStatus(@Param('id') id: string, @Body('status') status: ReportStatus) {
         return this.reportsService.updateStatus(id, status);
     }
 
     @Delete(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(UserRole.ADMIN)
-    remove(@Param('id') id: string) {
-        return this.reportsService.remove(id);
+    @UseGuards(JwtAuthGuard)
+    remove(@Param('id') id: string, @Req() req: any) {
+        return this.reportsService.remove(id, req.user);
     }
 
     @Patch(':id/assign-department')

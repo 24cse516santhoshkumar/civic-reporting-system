@@ -12,6 +12,7 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactEleme
     }
 
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+        console.warn(`ProtectedRoute: Access denied for role ${user.role}. Allowed: ${allowedRoles}`);
         return <Navigate to="/dashboard" replace />;
     }
 
