@@ -117,7 +117,7 @@ const Dashboard = () => {
         };
         return (
             <span className={`px-2 py-1 rounded-md text-xs font-bold border ${styles[status as keyof typeof styles] || "bg-gray-500/10 text-gray-400"}`}>
-                {status.replace('_', ' ')}
+                {status === 'APPROVED' ? 'ACCEPTED' : status.replace('_', ' ')}
             </span>
         );
     };

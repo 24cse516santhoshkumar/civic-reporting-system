@@ -277,10 +277,12 @@ const IssueDetail = () => {
                             <div className="absolute top-4 right-4 z-20">
                                 <span className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-lg backdrop-blur-md border border-white/10 flex items-center
                                     ${issue.status === 'OPEN' ? 'bg-blue-500/80 text-white' :
-                                        issue.status === 'RESOLVED' ? 'bg-green-500/80 text-white' : 'bg-yellow-500/80 text-white'}`
+                                        issue.status === 'RESOLVED' ? 'bg-green-500/80 text-white' :
+                                            issue.status === 'APPROVED' ? 'bg-cyan-500/80 text-white' :
+                                                'bg-yellow-500/80 text-white'}`
                                 }>
                                     {issue.status === 'RESOLVED' ? <CheckCircle2 className="h-4 w-4 mr-2" /> : <Activity className="h-4 w-4 mr-2" />}
-                                    {issue.status}
+                                    {issue.status === 'APPROVED' ? 'ACCEPTED' : issue.status}
                                 </span>
                             </div>
                             <div className="h-96 w-full overflow-hidden relative bg-gray-800">
@@ -382,7 +384,7 @@ const IssueDetail = () => {
                                     <>
                                         <div className="grid grid-cols-2 gap-3">
                                             <button
-                                                onClick={() => handleUpdateStatus('IN_PROGRESS')}
+                                                onClick={() => handleUpdateStatus('APPROVED')}
                                                 className="py-3 px-4 rounded-xl bg-green-600/10 hover:bg-green-600/20 text-green-500 font-bold border border-green-500/10 transition-all flex items-center justify-center gap-2"
                                             >
                                                 <CheckCircle2 size={16} /> Accept
