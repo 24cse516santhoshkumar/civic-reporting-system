@@ -222,20 +222,22 @@ const Dashboard = () => {
                         </div>
                     </motion.div>
 
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Active Users</p>
-                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{(stats as DashboardStats & { totalUsers?: number }).totalUsers || 0}</h3>
+                    {user?.role === 'ADMIN' && (
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Active Users</p>
+                                    <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{(stats as DashboardStats & { totalUsers?: number }).totalUsers || 0}</h3>
+                                </div>
+                                <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 dark:text-purple-400">
+                                    <Users size={24} />
+                                </div>
                             </div>
-                            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 dark:text-purple-400">
-                                <Users size={24} />
+                            <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
+                                <TrendingUp size={14} className="mr-1" /> +5% new users
                             </div>
-                        </div>
-                        <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
-                            <TrendingUp size={14} className="mr-1" /> +5% new users
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    )}
                 </div>
 
                 {/* Map Section */}
