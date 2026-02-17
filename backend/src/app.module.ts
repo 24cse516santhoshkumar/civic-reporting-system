@@ -13,7 +13,10 @@ import { Report } from './reports/report.entity';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: '.env',
+        }),
         TypeOrmModule.forRootAsync({
             useFactory: () => {
                 const isProduction = !!process.env.DATABASE_URL;
