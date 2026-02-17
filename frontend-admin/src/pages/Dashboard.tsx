@@ -177,66 +177,68 @@ const Dashboard = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Total Reports</p>
-                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.total}</h3>
-                            </div>
-                            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500 dark:text-blue-400">
-                                <FileText size={24} />
-                            </div>
-                        </div>
-                        <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
-                            <TrendingUp size={14} className="mr-1" /> +12% from last month
-                        </div>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Resolved</p>
-                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.resolved}</h3>
-                            </div>
-                            <div className="p-3 bg-green-500/10 rounded-xl text-green-500 dark:text-green-400">
-                                <CheckCircle size={24} />
-                            </div>
-                        </div>
-                        <div className="mt-4 flex items-center text-xs dark:text-gray-400 text-gray-500">
-                            <Activity size={14} className="mr-1" /> Avg time: {stats.avgResolutionTime || 'N/A'}
-                        </div>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="text-sm font-medium dark:text-gray-400 text-gray-600">In Progress</p>
-                                <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.inProgress}</h3>
-                            </div>
-                            <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 dark:text-yellow-400">
-                                <Clock size={24} />
-                            </div>
-                        </div>
-                        <div className="mt-4 flex items-center text-xs text-yellow-600 dark:text-yellow-500">
-                            <AlertTriangle size={14} className="mr-1" /> {stats.open} Pending validation
-                        </div>
-                    </motion.div>
-
                     {user?.role === 'ADMIN' && (
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Active Users</p>
-                                    <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{(stats as DashboardStats & { totalUsers?: number }).totalUsers || 0}</h3>
+                        <>
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Total Reports</p>
+                                        <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.total}</h3>
+                                    </div>
+                                    <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500 dark:text-blue-400">
+                                        <FileText size={24} />
+                                    </div>
                                 </div>
-                                <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 dark:text-purple-400">
-                                    <Users size={24} />
+                                <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
+                                    <TrendingUp size={14} className="mr-1" /> +12% from last month
                                 </div>
-                            </div>
-                            <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
-                                <TrendingUp size={14} className="mr-1" /> +5% new users
-                            </div>
-                        </motion.div>
+                            </motion.div>
+
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Resolved</p>
+                                        <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.resolved}</h3>
+                                    </div>
+                                    <div className="p-3 bg-green-500/10 rounded-xl text-green-500 dark:text-green-400">
+                                        <CheckCircle size={24} />
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex items-center text-xs dark:text-gray-400 text-gray-500">
+                                    <Activity size={14} className="mr-1" /> Avg time: {stats.avgResolutionTime || 'N/A'}
+                                </div>
+                            </motion.div>
+
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-sm font-medium dark:text-gray-400 text-gray-600">In Progress</p>
+                                        <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{stats.inProgress}</h3>
+                                    </div>
+                                    <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 dark:text-yellow-400">
+                                        <Clock size={24} />
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex items-center text-xs text-yellow-600 dark:text-yellow-500">
+                                    <AlertTriangle size={14} className="mr-1" /> {stats.open} Pending validation
+                                </div>
+                            </motion.div>
+
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-sm font-medium dark:text-gray-400 text-gray-600">Active Users</p>
+                                        <h3 className="text-3xl font-bold dark:text-white text-gray-900 mt-1">{(stats as DashboardStats & { totalUsers?: number }).totalUsers || 0}</h3>
+                                    </div>
+                                    <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 dark:text-purple-400">
+                                        <Users size={24} />
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex items-center text-xs text-green-500 dark:text-green-400">
+                                    <TrendingUp size={14} className="mr-1" /> +5% new users
+                                </div>
+                            </motion.div>
+                        </>
                     )}
                 </div>
 
