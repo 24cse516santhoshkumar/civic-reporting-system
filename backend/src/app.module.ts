@@ -14,11 +14,18 @@ import { Report } from './reports/report.entity';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
-        TypeOrmModule.forRoot({
-            type: 'sqlite',
-            database: 'civic.sqlite',
-            entities: [User, Report],
-            synchronize: true, // Auto-create tables for dev
+        TypeOrmModule.forRootAsync({
+            useFactory: () => {
+                const isProduction = !!process.env.DATABASE_URL;
+                return {
+                    type: isProduction ? 'postgres' : 'sqlite',
+                    url: process.env.DATABASE_URL,
+                    database: isProduction ? undefined : 'civic.sqlite',
+                    entities: [User, Report],
+                    synchronize: true,
+                    ssl: isProduction ? { rejectUnauthorized: false } : false,
+                } as any;
+            },
         }),
         ReportsModule,
         AuthModule,
