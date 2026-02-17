@@ -1,0 +1,31 @@
+services:
+  # Backend Service
+  - type: web
+    name: civic-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://civic_v2gi_user:5DSOh9e056XEXam11FGvJCgphaO7UdRK@dpg-d6a0sv95pdvs738pkp70-a.oregon-postgres.render.com/civic_v2gi
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Frontend Service (Static Site)
+  - type: static
+    name: civic-frontend
+    env: static
+    rootDir: frontend-admin
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /**
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: civic-backend
+          property: url
