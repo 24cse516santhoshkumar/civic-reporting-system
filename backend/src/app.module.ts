@@ -26,7 +26,7 @@ import { Report } from './reports/report.entity';
                     database: isProduction ? undefined : 'civic.sqlite',
                     entities: [User, Report],
                     synchronize: true,
-                    ssl: isProduction ? { rejectUnauthorized: false } : false,
+                    ssl: (isProduction && !process.env.DATABASE_URL.includes('localhost')) ? { rejectUnauthorized: false } : false,
                 } as any;
             },
         }),
